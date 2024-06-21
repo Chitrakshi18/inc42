@@ -5,17 +5,14 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: go
-
+    name: lint
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Go
-        uses: actions/setup-go@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: 1.16
-      - name: Install dependencies
-        run: go mod tidy
-      - name: Run lint
-        run: go run github.com/golangci/golangci-lint/cmd/golangci-lint run
+          go-version: stable
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.58
+          working-directory: go
