@@ -7,16 +7,18 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		message := map[string]string{"message": "Hello from Go API!"}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(message)
+	http.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
+		fmt.Fprintf(w, "Welcome from Go API!")
 	})
 
-    http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
-		message := map[string]string{"message": "Hello World endpoint"}
+	http.HandleFunc("/hello", func(w http.ResponseWriter, _ *http.Request) {
+		message := map[string]string{"message": "This is hello endpoint from Go API!"}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(message)
+		err := json.NewEncoder(w).Encode(message)
+		if err != nil {
+			http.Error(w, "Failed to encode JSON", http.StatusInternalServerError)
+			return
+		}
 	})
 
 	port := ":8080"
