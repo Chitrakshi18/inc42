@@ -1,11 +1,10 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) {
-    exit;
-}
+get_header();
+?>
 
-function myplugin_greet() {
-    echo '<p>Hello from WordPress!</p>';
-}
+<h1>Hello World</h1>
 
-add_action( 'admin_notices', 'myplugin_greet' );
+<?php
+get_footer();
+?>
