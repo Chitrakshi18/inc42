@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build-and-push-image:
+  build-and-deploy:
     runs-on: ubuntu-latest
     name: lint
     steps:
@@ -38,3 +38,13 @@ jobs:
         run: |
           docker push chitrakshipuri/go-app:latest
           docker push chitrakshipuri/go-app:$(git rev-parse --short HEAD)
+
+      - name: Deploy to ECS
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
+          ECS_SERVICE: ${{ secrets.GOAPP_ECS_SERVICE }}
+        run: |
+          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment

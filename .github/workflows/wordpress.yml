@@ -1,4 +1,4 @@
-name: WordPress CI/CD
+name: Go CI/CD
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build-and-push-image:
+  build-and-deploy:
     runs-on: ubuntu-latest
     name: Build and Deploy
     steps:
@@ -27,10 +27,21 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t chitrakshipuri/wordpress:latest .
-          docker tag chitrakshipuri/wordpress:latest chitrakshipuri/wordpress:$(git rev-parse --short HEAD)
+          cd go
+          docker build -t chitrakshipuri/goapp:latest .
+          docker tag chitrakshipuri/goapp:latest chitrakshipuri/goapp:$(git rev-parse --short HEAD)
 
       - name: Push Docker image
         run: |
-          docker push chitrakshipuri/wordpress:latest
-          docker push chitrakshipuri/wordpress:$(git rev-parse --short HEAD)
+          docker push chitrakshipuri/goapp:latest
+          docker push chitrakshipuri/goapp:$(git rev-parse --short HEAD)
+
+      - name: Deploy to ECS
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
+          ECS_SERVICE: ${{ secrets.WP_ECS_SERVICE }}
+        run: |
+          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment
